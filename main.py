@@ -50,7 +50,6 @@ class SortingAlgorithm:
 
     def sorting_completed(self):
         for i in range(len(self.bars)):
-            time.sleep(1 / (10 ** 10))
             self.bar_canvas.create_rectangle(
                 self.bars[i].x,
                 self.bars[i].y,
@@ -70,23 +69,25 @@ class SortingAlgorithm:
         while self.bars[i1].x != des_x or self.bars[i2].x != og_x:
             if self.bars[i1].x < des_x:  # moves bar to right
                 self.bar_canvas.move(self.recs[i1], rate, 0)  # moves i1 bar to i2
+                self.bar_canvas.update()
                 self.bars[i1].x += rate
                 self.bars[i1].x2 += rate
 
                 self.bar_canvas.move(self.recs[i2], -rate, 0)  # moves i2 to og_x
+                self.bar_canvas.update()
                 self.bars[i2].x -= rate
                 self.bars[i2].x2 -= rate
 
             elif self.bars[i1].x > des_x:
                 self.bar_canvas.move(self.recs[i1], -rate, 0)
+                self.bar_canvas.update()
                 self.bars[i1].x -= rate
                 self.bars[i1].x2 -= rate
 
                 self.bar_canvas.move(self.recs[i2], rate, 0)
+                self.bar_canvas.update()
                 self.bars[i2].x += rate
                 self.bars[i2].x2 += rate
-
-            self.bar_canvas.update()
 
         self.recs[i1], self.recs[i2], self.bars[i1], self.bars[i2] = (
             self.recs[i2],
