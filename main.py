@@ -1,6 +1,6 @@
 import random
 import time
-import copy
+from copy import copy
 from tkinter import *
 
 
@@ -32,16 +32,6 @@ class Rectangle:
             outline="#495057",
         )
 
-    def highlight(self, color="red"):
-        self.hlight = self.canvas.create_rectangle(
-            self.x, self.y, self.x2, self.height, fill=color, outline=color
-        )
-        self.canvas.update()
-
-    def unhighlight(self):
-        self.canvas.delete(self.hlight)
-        self.hlight = None
-
     def set_height(self, height):
         self.height = height
 
@@ -66,17 +56,161 @@ class SortingAlgorithm:
         self.window.config(bg="#ffffff")
         self.window.iconphoto(False, PhotoImage(file="images/icon.png"))
 
-        self.chosen_ones = []
-
-        self.top_canvas = Canvas(self.window, width=self.width, height=50)
+        self.top_canvas = Canvas(
+            self.window,
+            width=self.width,
+            height=43,
+            bg="#f8f9fa",
+        )
         self.bar_canvas = Canvas(
-            self.window, width=self.width, height=self.height - 20, bg="white"
+            self.window, width=self.width, height=self.height - 20, bg="#f8f9fa"
         )
         self.top_canvas.pack(side=TOP)
         self.bar_canvas.pack(side=BOTTOM)
-        self.Sorting_GUI()
+
+        self.Header()
+        self.Body()
 
         self.window.mainloop()
+
+    def Header(self):
+        self.run_btn = Button(
+            self.window,
+            text="Run",
+            width=7,
+            height=2,
+            bd=0,
+            bg="#29bf12",
+            fg="#000000",
+            activebackground="#3f7d20",
+            command=self.run,
+        )
+        self.run_btn.place(x=5, y=5)
+
+        self.reset_btn = Button(
+            self.window,
+            text="Reset",
+            width=10,
+            height=2,
+            bd=0,
+            bg="#ced4da",
+            fg="#000000",
+            activebackground="#495057",
+            command=self.reset,
+        )
+        self.reset_btn.place(x=65, y=5)
+
+        sorting_algorithms = [
+            "Selection Sort",
+            "Quick Sort",
+            "Bubble Sort",
+            "Insertion Sort",
+            "Heap Sort",
+            "Merge Sort",
+            "Run All",
+        ]
+
+        self.tkvar = StringVar(self.window)
+        self.question_menu = OptionMenu(self.window, self.tkvar, *sorting_algorithms)
+        self.question_menu.place(x=146, y=10)
+        self.question_menu.config(
+            bg="#ced4da", width=15, bd=0, activebackground="#495057"
+        )
+        self.tkvar.set(sorting_algorithms[0])
+
+    def run(self):
+        self.chosen_algorithm = self.tkvar.get()
+        if self.chosen_algorithm == "Selection Sort":
+            s = time.time()
+            self.selection_sort(self.bars)
+            e = time.time()
+            print("select:\t", e - s)
+
+        elif self.chosen_algorithm == "Quick Sort":
+            s = time.time()
+            self.quick_sort(self.bars, 0, len(self.bars) - 1)
+            e = time.time()
+            print("quick:\t", e - s)
+
+        elif self.chosen_algorithm == "Bubble Sort":
+            s = time.time()
+            self.bubble_sort(self.bars)
+            e = time.time()
+            print("bubble:\t", e - s)
+
+        elif self.chosen_algorithm == "Insertion Sort":
+            s = time.time()
+            self.insertion_sort(self.bars)
+            e = time.time()
+            print("insert:\t", e - s)
+
+        elif self.chosen_algorithm == "Heap Sort":
+            s = time.time()
+            self.heap_sort(self.bars)
+            e = time.time()
+            print("heap:\t", e - s)
+
+        elif self.chosen_algorithm == "Merge Sort":
+            s = time.time()
+            self.merge_sort(self.bars)
+            e = time.time()
+            print("merge:\t", e - s)
+
+        elif self.chosen_algorithm == "Run All":
+            # """
+            s = time.time()
+            self.selection_sort(self.bars)
+            e = time.time()
+            print("select:\t", e - s)
+            self.completed()
+
+            time.sleep(2)
+            self.reset()
+
+            s = time.time()
+            self.quick_sort(self.bars, 0, len(self.bars) - 1)
+            e = time.time()
+            print("quick:\t", e - s)
+            self.completed()
+            #
+            time.sleep(2)
+            self.reset()
+
+            s = time.time()
+            self.bubble_sort(self.bars)
+            e = time.time()
+            print("bubble:\t", e - s)
+            self.completed()
+
+            time.sleep(2)
+            self.reset()
+
+            s = time.time()
+            self.insertion_sort(self.bars)
+            e = time.time()
+            print("insert:\t", e - s)
+            self.completed()
+
+            time.sleep(2)
+            self.reset()
+
+            s = time.time()
+            self.heap_sort(self.bars)
+            e = time.time()
+            print("heap:\t", e - s)
+            self.completed()
+
+            time.sleep(2)
+            self.reset()
+
+            s = time.time()
+            self.merge_sort(self.bars)
+            e = time.time()
+            print("merge:\t", e - s)
+            # self.completed()
+            # """
+
+        self.completed()
 
     def completed(self, completed_color="#00b200"):
         self.completion_bars = []
@@ -95,10 +229,12 @@ class SortingAlgorithm:
             )
             self.bar_canvas.update()
 
-    def empty(self):
+    def reset(self):
         self.bar_canvas.delete("all")
         self.chosen_ones = []
         self.completion_bars = []
+
+        self.Body()
 
     def select(self, index, tag, color="blue"):
         self.chosen_ones.append(
@@ -133,17 +269,17 @@ class SortingAlgorithm:
         self.bar_canvas.moveto(self.bars[i2].rec, str(og_x - 1), "1")
         self.bars[i2].set_x(og_x)
 
-        self.bar_canvas.update()
         self.bars[i1], self.bars[i2] = self.bars[i2], self.bars[i1]
 
-    def randomize(self, gap=1, width=10, min_height=1):
+    def Body(self, gap=1, width=1, min_height=1):
+        self.chosen_ones = []
         self.bars = []
         x1 = 2
         y1 = 2
         gap = gap
         rec_width = width
 
-        amount_of_bars = self.width // (rec_width + gap)
+        amount_of_bars = self.width // (rec_width + gap) - 1
         self.ranints = [x for x in range(1, amount_of_bars + 1)]
         random.shuffle(self.ranints)
 
@@ -154,69 +290,6 @@ class SortingAlgorithm:
             x1 += rec_width + gap
             self.bars[i].draw()
 
-    def Sorting_GUI(self):
-        gap = 1
-        width = 1
-        self.randomize(gap=gap, width=width)
-
-        # """
-        s = time.time()
-        self.selection_sort(self.bars)
-        e = time.time()
-        print("select:\t", e - s)
-        self.completed()
-
-        self.empty()
-        time.sleep(2)
-        self.randomize(gap=gap, width=width)
-
-        s = time.time()
-        self.quick_sort(self.bars, 0, len(self.bars) - 1)
-        e = time.time()
-        print("quick:\t", e - s)
-        self.completed()
-        #
-        self.empty()
-        time.sleep(2)
-        self.randomize(gap=gap, width=width)
-
-        s = time.time()
-        self.bubble_sort(self.bars)
-        e = time.time()
-        print("bubble:\t", e - s)
-        self.completed()
-
-        self.empty()
-        time.sleep(2)
-        self.randomize(gap=gap, width=width)
-
-        s = time.time()
-        self.insertion_sort(self.bars)
-        e = time.time()
-        print("insert:\t", e - s)
-        self.completed()
-
-        self.empty()
-        time.sleep(2)
-        self.randomize(gap=gap, width=width)
-
-        s = time.time()
-        self.heap_sort(self.bars)
-        e = time.time()
-        print("heap:\t", e - s)
-        self.completed()
-
-        self.empty()
-        time.sleep(2)
-        self.randomize(gap=gap, width=width)
-
-        s = time.time()
-        self.merge_sort(self.bars)
-        e = time.time()
-        print("merge:\t", e - s)
-        self.completed()
-        # """
-
     # self.selection_sort(self.bars)
     # self.quick_sort(self.bars, 0, len(self.bars) - 1)
     # self.bubble_sort(self.bars)
@@ -224,7 +297,7 @@ class SortingAlgorithm:
     # self.heap_sort(self.bars)
     # self.merge_sort(self.bars)
 
-    # *************** SORTING ALGORITHMS ***************
+    # ****************************** SORTING ALGORITHMS ******************************
     # SELECTION SORT                        ---------------
     def selection_sort(self, arr):
         for i in range(len(arr)):
@@ -233,8 +306,8 @@ class SortingAlgorithm:
                 if arr[j].height < arr[min_idx].height:
                     min_idx = j
 
-            self.select(min_idx, "min")
-            self.select(i, "i", "red")
+            self.select(min_idx, "min", "red")
+            self.select(i, "i")
             self.switch(min_idx, i)
             # arr[min_idx], arr[i] = arr[i], arr[min_idx]
             self.unselect("min")
@@ -353,71 +426,49 @@ class SortingAlgorithm:
 
             i = j = k = 0
 
-            L = [copy.copy(iL) for iL in L]
-            R = [copy.copy(iR) for iR in R]
+            L = [copy(iL) for iL in L]
+            R = [copy(iR) for iR in R]
             while i < len(L) and j < len(R):
                 if L[i].height < R[j].height:
-                    self.select(self.bars.index(arr[k]), "k", "red")
+                    self.select(self.bars.index(arr[k]), "kL1", "red")
                     arr[k].set_height(L[i].height)
                     # arr[k] = L[i]
                     arr[k].redraw()
-                    self.unselect("k")
+                    self.unselect("kL1")
 
                     i += 1
                 else:
-                    self.select(self.bars.index(arr[k]), "k", "red")
+                    self.select(self.bars.index(arr[k]), "kR1", "red")
                     arr[k].set_height(R[j].height)
                     # arr[k] = R[j]
                     arr[k].redraw()
-                    self.unselect("k")
+                    self.unselect("kR1")
 
                     j += 1
 
                 k += 1
 
             while i < len(L):
-                self.select(self.bars.index(arr[k]), "k", "red")
+                self.select(self.bars.index(arr[k]), "kL2", "red")
                 arr[k].set_height(L[i].height)
                 # arr[k] = L[i]
                 arr[k].redraw()
-                self.unselect("k")
+                self.unselect("kL2")
 
                 i += 1
                 k += 1
 
             while j < len(R):
-                self.select(self.bars.index(arr[k]), "k", "red")
+                self.select(self.bars.index(arr[k]), "kR2", "red")
                 arr[k].set_height(R[j].height)
                 # arr[k] = R[j]
                 arr[k].redraw()
-                self.unselect("k")
+                self.unselect("kR2")
 
                 j += 1
                 k += 1
 
-    # BUCKET SORT                           ---------------
-    def bucketSort(self, arr):
-        bucket = []
-
-        for i in range(len(arr)):
-            bucket.append([])
-
-        for j in arr:
-            index_b = int(10 * j)
-            bucket[index_b].append(j)
-
-        for i in range(len(arr)):
-            bucket[i] = sorted(bucket[i])
-
-        k = 0
-        for i in range(len(arr)):
-            for j in range(len(bucket[i])):
-                arr[k] = bucket[i][j]
-                k += 1
-
-        return arr
-
-    # RADIX SORT                            ---------------
+    # RADIX SORT                            --------------- #not setup
     def counting_sort(self, arr, exp1):
         n = len(arr)
 
@@ -444,7 +495,7 @@ class SortingAlgorithm:
             arr[i] = output[i]
 
     def radix_sort(self, arr):
-        max1 = max(arr.height)
+        max1 = max(arr)
 
         exp = 1
         while max1 / exp > 0:
