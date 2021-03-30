@@ -32,6 +32,9 @@ class Rectangle:
             outline="#495057",
         )
 
+    def delete_drawing(self):
+        self.canvas.delete(self.rec)
+
     def set_height(self, height):
         self.height = height
 
@@ -70,10 +73,38 @@ class SortingAlgorithm:
 
         self.Header()
         self.Body()
+        # self.test()
 
         self.window.mainloop()
 
+    def test(self):
+        self.Body(gap=1, width=150)  # 150
+        # print([x.height for x in self.bars])
+        print(len(self.bars))
+        self.radix_sort(self.bars)
+
+        # print([x.height for x in self.bars])
+        # self.completed()
+
     def Header(self):
+        sorting_algorithms = [
+            "Selection Sort",
+            "Quick Sort",
+            "Bubble Sort",
+            "Insertion Sort",
+            "Heap Sort",
+            "Merge Sort",
+            "Radix Sort",
+            "Run All",
+        ]
+
+        self.tkvar = StringVar(self.window)
+        self.question_menu = OptionMenu(self.window, self.tkvar, *sorting_algorithms)
+        self.question_menu.place(x=146, y=10)
+        self.question_menu.config(
+            bg="#ced4da", width=15, bd=0, activebackground="#495057"
+        )
+        self.tkvar.set(sorting_algorithms[0])
         self.run_btn = Button(
             self.window,
             text="Run",
@@ -99,24 +130,6 @@ class SortingAlgorithm:
             command=self.reset,
         )
         self.reset_btn.place(x=65, y=5)
-
-        sorting_algorithms = [
-            "Selection Sort",
-            "Quick Sort",
-            "Bubble Sort",
-            "Insertion Sort",
-            "Heap Sort",
-            "Merge Sort",
-            "Run All",
-        ]
-
-        self.tkvar = StringVar(self.window)
-        self.question_menu = OptionMenu(self.window, self.tkvar, *sorting_algorithms)
-        self.question_menu.place(x=146, y=10)
-        self.question_menu.config(
-            bg="#ced4da", width=15, bd=0, activebackground="#495057"
-        )
-        self.tkvar.set(sorting_algorithms[0])
 
     def run(self):
         self.chosen_algorithm = self.tkvar.get()
@@ -155,6 +168,12 @@ class SortingAlgorithm:
             self.merge_sort(self.bars)
             e = time.time()
             print("merge:\t", e - s)
+
+        elif self.chosen_algorithm == "Radix Sort":
+            s = time.time()
+            self.radix_sort(self.bars)
+            e = time.time()
+            print("radix:\t", e - s)
 
         elif self.chosen_algorithm == "Run All":
             # """
@@ -207,6 +226,14 @@ class SortingAlgorithm:
             self.merge_sort(self.bars)
             e = time.time()
             print("merge:\t", e - s)
+
+            time.sleep(2)
+            self.reset()
+
+            s = time.time()
+            self.radix_sort(self.bars)
+            e = time.time()
+            print("radix:\t", e - s)
             # self.completed()
             # """
 
@@ -251,6 +278,7 @@ class SortingAlgorithm:
             ]
         )
 
+        # time.sleep(0.05)
         self.bar_canvas.update()
 
     def unselect(self, tag):
@@ -302,10 +330,14 @@ class SortingAlgorithm:
     def selection_sort(self, arr):
         for i in range(len(arr)):
             min_idx = i
+            self.select(min_idx, "minx", "green")
             for j in range(i + 1, len(arr)):
                 if arr[j].height < arr[min_idx].height:
+                    self.unselect("minx")
                     min_idx = j
+                    self.select(min_idx, "minx", "green")
 
+            self.unselect("minx")
             self.select(min_idx, "min", "red")
             self.select(i, "i")
             self.switch(min_idx, i)
@@ -477,7 +509,7 @@ class SortingAlgorithm:
         count = [0] * (10)
 
         for i in range(0, n):
-            index = arr[i] / exp1
+            index = arr[i].height / exp1
             count[int(index % 10)] += 1
 
         for i in range(1, 10):
@@ -485,17 +517,26 @@ class SortingAlgorithm:
 
         i = n - 1
         while i >= 0:
-            index = arr[i] / exp1
-            output[count[int(index % 10)] - 1] = arr[i]
+            index = arr[i].height / exp1
+            output[count[int(index % 10)] - 1] = copy(arr[i])  # arr[i]  # copy(arr[i])
             count[int(index % 10)] -= 1
             i -= 1
 
         i = 0
+        print([x.height for x in output])
         for i in range(0, len(arr)):
-            arr[i] = output[i]
+
+            self.select(i, "i", "red")
+            # time.sleep(0.005)
+            arr[i].set_height(output[i].height)
+            # arr[i] = output[i]
+            arr[i].redraw()
+
+            self.unselect("i")
 
     def radix_sort(self, arr):
-        max1 = max(arr)
+        max1 = max([x.height for x in arr])
+        print(max1)
 
         exp = 1
         while max1 / exp > 0:
