@@ -489,49 +489,6 @@ class SortingAlgorithm:
                 j += 1
                 k += 1
 
-    # RADIX SORT                            --------------- #not setup
-    def counting_sort(self, arr, exp1):
-        n = len(arr)
-
-        output = [0] * (n)
-
-        count = [0] * (10)
-
-        for i in range(0, n):
-            index = arr[i].height / exp1
-            count[int(index % 10)] += 1
-
-        for i in range(1, 10):
-            count[i] += count[i - 1]
-
-        i = n - 1
-        while i >= 0:
-            index = arr[i].height / exp1
-            output[count[int(index % 10)] - 1] = copy(arr[i])  # arr[i]  # copy(arr[i])
-            count[int(index % 10)] -= 1
-            i -= 1
-
-        i = 0
-        print([x.height for x in output])
-        for i in range(0, len(arr)):
-
-            self.select(i, "i", "red")
-            # time.sleep(0.005)
-            arr[i].set_height(output[i].height)
-            # arr[i] = output[i]
-            arr[i].redraw()
-
-            self.unselect("i")
-
-    def radix_sort(self, arr):
-        max1 = max([x.height for x in arr])
-        print(max1)
-
-        exp = 1
-        while max1 / exp > 0:
-            self.counting_sort(arr, exp)
-            exp *= 10
-
 
 if __name__ == "__main__":
     SortingAlgorithm()
