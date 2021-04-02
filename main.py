@@ -54,7 +54,7 @@ class SortingAlgorithm:
         self.height = 600
 
         self.window.title("Sorting Algorithms")
-        self.window.geometry(f"{self.width}x{self.height}")  # WxH
+        self.window.geometry(f"1080x600")  # WxH
         self.window.resizable(False, False)
         self.window.config(bg="#ffffff")
         self.window.iconphoto(False, PhotoImage(file="images/icon.png"))
@@ -66,25 +66,15 @@ class SortingAlgorithm:
             bg="#f8f9fa",
         )
         self.bar_canvas = Canvas(
-            self.window, width=self.width, height=self.height - 20, bg="#f8f9fa"
+            self.window, width=self.width, height=580, bg="#f8f9fa"
         )
         self.top_canvas.pack(side=TOP)
         self.bar_canvas.pack(side=BOTTOM)
 
+        self.playing = True
         self.Header()
         self.Body()
-        # self.test()
-
         self.window.mainloop()
-
-    def test(self):
-        self.Body(gap=1, width=150)  # 150
-        # print([x.height for x in self.bars])
-        print(len(self.bars))
-        self.radix_sort(self.bars)
-
-        # print([x.height for x in self.bars])
-        # self.completed()
 
     def Header(self):
         sorting_algorithms = [
@@ -94,17 +84,9 @@ class SortingAlgorithm:
             "Insertion Sort",
             "Heap Sort",
             "Merge Sort",
-            "Radix Sort",
             "Run All",
         ]
 
-        self.tkvar = StringVar(self.window)
-        self.question_menu = OptionMenu(self.window, self.tkvar, *sorting_algorithms)
-        self.question_menu.place(x=146, y=10)
-        self.question_menu.config(
-            bg="#ced4da", width=15, bd=0, activebackground="#495057"
-        )
-        self.tkvar.set(sorting_algorithms[0])
         self.run_btn = Button(
             self.window,
             text="Run",
@@ -131,113 +113,122 @@ class SortingAlgorithm:
         )
         self.reset_btn.place(x=65, y=5)
 
+        self.tkvar = StringVar(self.window)
+        self.question_menu = OptionMenu(self.window, self.tkvar, *sorting_algorithms)
+        self.question_menu.place(x=146, y=10)
+        self.question_menu.config(
+            bg="#ced4da", width=15, bd=0, activebackground="#495057"
+        )
+        self.tkvar.set(sorting_algorithms[0])
+
+        rec_gap_label = self.top_canvas.create_text(292, 23, text="Gap")
+        self.gap_scale = Scale(self.window, from_=1, to=5, orient=HORIZONTAL)
+        self.gap_scale.set(1)
+        self.gap_scale.place(x=310, y=5)
+
+        rec_width_label = self.top_canvas.create_text(440, 23, text="Width")
+        self.rec_scale = Scale(self.window, from_=1, to=10, orient=HORIZONTAL)
+        self.rec_scale.set(1)
+        self.rec_scale.place(x=465, y=5)
+
+        min_height_label = self.top_canvas.create_text(610, 23, text="Min Height")
+        self.min_height_scale = Scale(self.window, from_=1, to=50, orient=HORIZONTAL)
+        self.min_height_scale.set(1)
+        self.min_height_scale.place(x=650, y=5)
+
     def run(self):
-        self.chosen_algorithm = self.tkvar.get()
-        if self.chosen_algorithm == "Selection Sort":
-            s = time.time()
-            self.selection_sort(self.bars)
-            e = time.time()
-            print("select:\t", e - s)
+        if self.playing == True:
+            self.playing = False
+            if self.tkvar.get() == "Selection Sort":
+                s = time.time()
+                self.selection_sort(self.bars)
+                e = time.time()
+                print("select:\t", e - s)
 
-        elif self.chosen_algorithm == "Quick Sort":
-            s = time.time()
-            self.quick_sort(self.bars, 0, len(self.bars) - 1)
-            e = time.time()
-            print("quick:\t", e - s)
+            elif self.tkvar.get() == "Quick Sort":
+                s = time.time()
+                self.quick_sort(self.bars, 0, len(self.bars) - 1)
+                e = time.time()
+                print("quick:\t", e - s)
 
-        elif self.chosen_algorithm == "Bubble Sort":
-            s = time.time()
-            self.bubble_sort(self.bars)
-            e = time.time()
-            print("bubble:\t", e - s)
+            elif self.tkvar.get() == "Bubble Sort":
+                s = time.time()
+                self.bubble_sort(self.bars)
+                e = time.time()
+                print("bubble:\t", e - s)
 
-        elif self.chosen_algorithm == "Insertion Sort":
-            s = time.time()
-            self.insertion_sort(self.bars)
-            e = time.time()
-            print("insert:\t", e - s)
+            elif self.tkvar.get() == "Insertion Sort":
+                self.playing = False
+                s = time.time()
+                self.insertion_sort(self.bars)
+                e = time.time()
+                print("insert:\t", e - s)
 
-        elif self.chosen_algorithm == "Heap Sort":
-            s = time.time()
-            self.heap_sort(self.bars)
-            e = time.time()
-            print("heap:\t", e - s)
+            elif self.tkvar.get() == "Heap Sort":
+                s = time.time()
+                self.heap_sort(self.bars)
+                e = time.time()
+                print("heap:\t", e - s)
 
-        elif self.chosen_algorithm == "Merge Sort":
-            s = time.time()
-            self.merge_sort(self.bars)
-            e = time.time()
-            print("merge:\t", e - s)
+            elif self.tkvar.get() == "Merge Sort":
+                s = time.time()
+                self.merge_sort(self.bars)
+                e = time.time()
+                print("merge:\t", e - s)
 
-        elif self.chosen_algorithm == "Radix Sort":
-            s = time.time()
-            self.radix_sort(self.bars)
-            e = time.time()
-            print("radix:\t", e - s)
+            elif self.tkvar.get() == "Run All":
+                s = time.time()
+                self.selection_sort(self.bars)
+                e = time.time()
+                print("select:\t", e - s)
+                self.completed()
 
-        elif self.chosen_algorithm == "Run All":
-            # """
-            s = time.time()
-            self.selection_sort(self.bars)
-            e = time.time()
-            print("select:\t", e - s)
+                time.sleep(2)
+                self.reset()
+
+                s = time.time()
+                self.quick_sort(self.bars, 0, len(self.bars) - 1)
+                e = time.time()
+                print("quick:\t", e - s)
+                self.completed()
+
+                time.sleep(2)
+                self.reset()
+
+                s = time.time()
+                self.bubble_sort(self.bars)
+                e = time.time()
+                print("bubble:\t", e - s)
+                self.completed()
+
+                time.sleep(2)
+                self.reset()
+
+                s = time.time()
+                self.insertion_sort(self.bars)
+                e = time.time()
+                print("insert:\t", e - s)
+                self.completed()
+
+                time.sleep(2)
+                self.reset()
+
+                s = time.time()
+                self.heap_sort(self.bars)
+                e = time.time()
+                print("heap:\t", e - s)
+                self.completed()
+
+                time.sleep(2)
+                self.reset()
+
+                s = time.time()
+                self.merge_sort(self.bars)
+                e = time.time()
+                print("merge:\t", e - s)
+
+            self.playing = True
             self.completed()
-
-            time.sleep(2)
-            self.reset()
-
-            s = time.time()
-            self.quick_sort(self.bars, 0, len(self.bars) - 1)
-            e = time.time()
-            print("quick:\t", e - s)
-            self.completed()
-            #
-            time.sleep(2)
-            self.reset()
-
-            s = time.time()
-            self.bubble_sort(self.bars)
-            e = time.time()
-            print("bubble:\t", e - s)
-            self.completed()
-
-            time.sleep(2)
-            self.reset()
-
-            s = time.time()
-            self.insertion_sort(self.bars)
-            e = time.time()
-            print("insert:\t", e - s)
-            self.completed()
-
-            time.sleep(2)
-            self.reset()
-
-            s = time.time()
-            self.heap_sort(self.bars)
-            e = time.time()
-            print("heap:\t", e - s)
-            self.completed()
-
-            time.sleep(2)
-            self.reset()
-
-            s = time.time()
-            self.merge_sort(self.bars)
-            e = time.time()
-            print("merge:\t", e - s)
-
-            time.sleep(2)
-            self.reset()
-
-            s = time.time()
-            self.radix_sort(self.bars)
-            e = time.time()
-            print("radix:\t", e - s)
-            # self.completed()
-            # """
-
-        self.completed()
 
     def completed(self, completed_color="#00b200"):
         self.completion_bars = []
@@ -257,11 +248,12 @@ class SortingAlgorithm:
             self.bar_canvas.update()
 
     def reset(self):
-        self.bar_canvas.delete("all")
-        self.chosen_ones = []
-        self.completion_bars = []
+        if self.playing == True:
+            self.bar_canvas.delete("all")
+            self.chosen_ones = []
+            self.completion_bars = []
 
-        self.Body()
+            self.Body()
 
     def select(self, index, tag, color="blue"):
         self.chosen_ones.append(
@@ -299,16 +291,20 @@ class SortingAlgorithm:
 
         self.bars[i1], self.bars[i2] = self.bars[i2], self.bars[i1]
 
-    def Body(self, gap=1, width=1, min_height=1):
+    def Body(self):
+        gap = self.gap_scale.get()
+        rec_width = self.rec_scale.get()
+        min_height = self.min_height_scale.get()
+
         self.chosen_ones = []
         self.bars = []
         x1 = 2
         y1 = 2
-        gap = gap
-        rec_width = width
 
         amount_of_bars = self.width // (rec_width + gap) - 1
-        self.ranints = [x for x in range(1, amount_of_bars + 1)]
+        self.ranints = [
+            x for x in range(1 + min_height, amount_of_bars + min_height + 1)
+        ]
         random.shuffle(self.ranints)
 
         for i in range(amount_of_bars):
@@ -317,13 +313,6 @@ class SortingAlgorithm:
             )
             x1 += rec_width + gap
             self.bars[i].draw()
-
-    # self.selection_sort(self.bars)
-    # self.quick_sort(self.bars, 0, len(self.bars) - 1)
-    # self.bubble_sort(self.bars)
-    # self.insertion_sort(self.bars)
-    # self.heap_sort(self.bars)
-    # self.merge_sort(self.bars)
 
     # ****************************** SORTING ALGORITHMS ******************************
     # SELECTION SORT                        ---------------
